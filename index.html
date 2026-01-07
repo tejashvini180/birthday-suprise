@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="te">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Happy Birthday Amma ❤️</title>
+  <style>
+    body{
+      margin:0;
+      font-family: 'Noto Sans Telugu', Arial, sans-serif;
+      background:linear-gradient(135deg,#ffdde1,#ee9ca7);
+      height:100vh;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      overflow-x:hidden;
+    }
+    .screen{
+      display:none;
+      text-align:center;
+      padding:20px;
+      max-width:420px;
+    }
+    .screen.active{
+      display:block;
+    }
+    button{
+      padding:12px 20px;
+      border:none;
+      border-radius:12px;
+      background:#ff5e78;
+      color:white;
+      font-size:16px;
+      cursor:pointer;
+      margin-top:12px;
+    }
+    #cakeImg{
+      font-size:80px;
+      cursor:pointer;
+      display:inline-block;
+      transition: transform 0.2s;
+    }
+    img{
+      width:100%;
+      border-radius:12px;
+      opacity: 0;
+      transition: opacity 0.8s ease-in-out;
+    }
+    img.show {
+      opacity: 1;
+    }
+    .letter{
+      line-height:1.6;
+      white-space: pre-wrap;
+      font-size:18px;
+      color:#d81b60;
+      display:inline-block;
+    }
+    #finalText::after {
+      content: '|';
+      animation: blink 1s infinite;
+      color: #d81b60;
+      margin-left:2px;
+    }
+    @keyframes blink {
+      0%,50% {opacity:1;}
+      51%,100% {opacity:0;}
+    }
+    @keyframes pop {
+      0% { transform: scale(1); }
+      30% { transform: scale(1.4); }
+      50% { transform: scale(0.9); }
+      70% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+    .pop {
+      animation: pop 0.6s ease forwards;
+    }
+    .end{
+      margin-top:15px;
+      font-weight:bold;
+    }
+
+    /* confetti styles */
+    .confetti {
+      position: fixed;
+      width: 10px;
+      height: 10px;
+      background-color: red;
+      top: -10px;
+      z-index: 9999;
+      pointer-events: none;
+      opacity: 0.9;
+      border-radius: 3px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- START SCREEN -->
+<div class="screen active" id="start">
+  <h1>Today is not a normal day…</h1>
+  <p>Someone very special was born ❤️</p>
+  <button id="startBtn">Enter Surprise 🎁</button>
+</div>
+
+<!-- MEMORY SCREENS -->
+<div class="screen" id="memory">
+  <p id="memoryText"></p>
+  <button onclick="nextMemory()">Next ➡️</button>
+</div>
+
+<!-- QUIZ -->
+<div class="screen" id="quiz">
+  <h2 id="quizQ"></h2>
+  <div id="quizOptions"></div>
+  <p id="quizMsg"></p>
+</div>
+
+<!-- CAKE -->
+<div class="screen" id="cake">
+  <h2>Time to cut the cake 🎂</h2>
+  <div id="cakeImg">🎂</div>
+  <p id="cakeMsg"></p>
+</div>
+
+<!-- PHOTOS -->
+<div class="screen" id="photos">
+  <img id="photo" src="">
+  <p id="photoText"></p>
+  <button onclick="nextPhoto()">Next ➡️</button>
+</div>
+
+<!-- FINAL -->
+<div class="screen" id="final">
+  <h1>Happy Birthday Amma ❤️</h1>
+  <p id="finalText" class="letter"></p>
+  <p class="end">Love you always 🙂</p>
+</div>
+
+<!-- AUDIO -->
+<audio id="bgm" src="assets/music.mp3" loop></audio>
+<audio id="clickSound" src="assets/click.mp3"></audio>
+<audio id="cakeSound" src="assets/cake.mp3"></audio>
+
+<script>
+const screens = document.querySelectorAll(".screen");
+const bgm = document.getElementById("bgm");
+const clickSound = document.getElementById("clickSound");
+const cakeSound = document.getElementById("cakeSound");
+
+// Show a screen
+function show(id){
+  screens.forEach(s=>s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+}
+
+// START
+document.getElementById("startBtn").onclick = () => {
+  bgm.volume = 0.5;
+  bgm.play();
+  clickSound.play();
+  show("memory");
+};
+
+// MEMORY
+const memories = [
+  "The day you were born, the world became brighter 🌞",
+  "Your smile fixes more than you realise 😊",
+  "Your care is the biggest strength 💪"
+];
+let memIndex = 0;
+function nextMemory(){
+  clickSound.play();
+  memIndex++;
+  if(memIndex < memories.length){
+    document.getElementById("memoryText").innerText = memories[memIndex];
+  }else{
+    show("quiz");
+    loadQuiz();
+  }
+}
+document.getElementById("memoryText").innerText = memories[0];
+
+// QUIZ
+const quiz = { q:"Who loves you the most?", options:["Everyone","Me 😌❤️"], correct:1 };
+function loadQuiz(){
+  document.getElementById("quizQ").innerText = quiz.q;
+  const box = document.getElementById("quizOptions");
+  box.innerHTML = "";
+  quiz.options.forEach((o,i)=>{
+    const b = document.createElement("button");
+    b.innerText = o;
+    b.onclick = ()=>{
+      document.getElementById("quizMsg").innerText =
+        i===quiz.correct ? "Correct 💖" : "Parledu… still loved 😄";
+      setTimeout(()=>show("cake"),1000);
+    };
+    box.appendChild(b);
+  });
+}
+
+// CAKE CLICK
+document.getElementById("cakeImg").onclick = ()=>{
+  cakeSound.play();
+  const cake = document.getElementById("cakeImg");
+  cake.classList.add("pop");
+  setTimeout(()=>{
+    cake.classList.remove("pop");
+    document.getElementById("cakeMsg").innerText =
+      "Make a wish… it’s already coming true ❤️";
+    setTimeout(()=>show("photos"),2000);
+  }, 600);
+};
+
+// PHOTOS
+const photos = [
+  {src:"photos/pic1.jpg", text:"So much love in one smile 💗"},
+  {src:"photos/pic2.jpg", text:"Always caring 🌷"},
+  {src:"photos/pic3.jpg", text:"Still the same warmth ✨"}
+];
+let p = 0;
+
+function nextPhoto(){
+  p++;
+  if(p < photos.length){
+    const photoEl = document.getElementById("photo");
+    const textEl = document.getElementById("photoText");
+    photoEl.classList.remove('show');
+    setTimeout(() => {
+      photoEl.src = photos[p].src;
+      textEl.innerText = photos[p].text;
+      photoEl.classList.add('show');
+    }, 300);
+  } else {
+    show("final");
+    typeWriterFinal();
+  }
+}
+
+// initialize first photo with fade-in
+window.onload = () => {
+  const photoEl = document.getElementById("photo");
+  photoEl.src = photos[0].src;
+  document.getElementById("photoText").innerText = photos[0].text;
+  setTimeout(() => photoEl.classList.add('show'), 100);
+};
+
+// TYPEWRITER EFFECT
+const finalText = `
+🎂 Happy Birthday Amma ❤️
+Mee kosam ee roju konchem special ga cheppali anipinchindi.
+
+Mee prema, mee care
+chala silent ga untayi…
+kani avi lekapothe chala khaali ga untundi 🌸
+
+Meeru prathi roju chese chinna chinna vishayalu
+eppudu notice cheyyakapoyina,
+avi naa jeevitham lo chala important.
+
+Meeru strong ga undadam,
+andarini kalupukoni nadipinchadam,
+nenu nerchukunna pedda paatam 💛
+
+Eppudu serious ga cheppakapoyina,
+mee value naa manasulo clear ga untundi.
+
+Ee roju mee day.
+Navvandi 😊
+Relax avvandi 🌷
+Mee happiness naaku chala important.
+
+Mee koduku / kuthuru
+eppudu mee pakkane untadu ❤️
+
+Happy Birthday once again Amma 🎉
+— with lots of love.
+`;
+
+function typeWriterFinal(){
+  const el = document.getElementById("finalText");
+  el.innerText = "";
+  let i = 0;
+  function typing(){
+    if(i < finalText.length){
+      el.innerText += finalText.charAt(i);
+      i++;
+      setTimeout(typing, 120);
+    } else {
+      startConfetti();
+    }
+  }
+  typing();
+}
+
+// CONFETTI FUNCTION
+function startConfetti(){
+  const colors = ["#f94144","#f3722c","#f9c74f","#90be6d","#43aa8b","#577590","#d81b60"];
+  for(let i=0;i<100;i++){
+    const conf = document.createElement("div");
+    conf.classList.add("confetti");
+    conf.style.backgroundColor = colors[Math.floor(Math.random()*colors.length)];
+    conf.style.left = Math.random()*100 + "vw";
+    conf.style.animation = `fall ${3 + Math.random()*2}s linear forwards`;
+    conf.style.width = (5 + Math.random()*5) + "px";
+    conf.style.height = conf.style.width;
+    document.body.appendChild(conf);
+
+    conf.animate([
+      { transform: `translateY(0px) rotate(0deg)` },
+      { transform: `translateY(100vh) rotate(${360 + Math.random()*360}deg)` }
+    ],{
+      duration: 3000 + Math.random()*2000,
+      iterations: 1,
+      easing: 'linear'
+    });
+
+    setTimeout(()=> conf.remove(), 5000);
+  }
+}
+</script>
+</body>
+</html>
